@@ -4,6 +4,8 @@ const CONSONANTS = new Set(
     'bcdfghjklmnpqrstvwxyz'.split('')
 );
 
+let dictionary = []; // Global dictionary array
+
 // Function to calculate penalty using sequence alignment
 function calculatePenalty(word1, word2) {
     const n = word1.length;
@@ -40,7 +42,7 @@ function calculatePenalty(word1, word2) {
 }
 
 // Get top 10 suggestions
-function getSuggestions(inputWord, dictionary) {
+function getSuggestions(inputWord) {
     const scores = dictionary.map((word) => ({
         word,
         penalty: calculatePenalty(inputWord, word),
@@ -50,19 +52,48 @@ function getSuggestions(inputWord, dictionary) {
     return scores.slice(0, 10).map((entry) => entry.word);
 }
 
-// Event listener for the button
-document.getElementById('checkButton').addEventListener('click', () => {
-    const inputWord = document.getElementById('wordInput').value.toLowerCase();
-    if (!inputWord) return;
+// Load dictionary from file
+function loadDictionary(filePath) {
+    fetch(filePath)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Failed to load dictionary: ${response.statusText}`);
+            }
+            return response.text();
+        })
+        .then((text) => {
+            // Process dictionary file line by line
+            dictionary = text
+                .split('\n')
+                .map((line) => line.trim().toLowerCase())
+                .filter((word) => word); // Remove empty lines
+            
+            console.log('Dictionary loaded successfully');
+            document.getElementById('checkButton').disabled = false; // Enable the button
+        })
+        .catch((error) => {
+            console.error(error);
+            alert('Failed to load the dictionary file.');
+        });
+}
 
-    const suggestions = getSuggestions(inputWord, dictionary);
+// Initialize the spell checker
+document.addEventListener('DOMContentLoaded', () => {
+    loadDictionary('dictionary.txt'); // Load dictionary from same directory
 
-    const suggestionsList = document.getElementById('suggestionsList');
-    suggestionsList.innerHTML = ''; // Clear previous suggestions
+    document.getElementById('checkButton').addEventListener('click', () => {
+        const inputWord = document.getElementById('wordInput').value.toLowerCase();
+        if (!inputWord) return;
 
-    suggestions.forEach((suggestion) => {
-        const li = document.createElement('li');
-        li.textContent = suggestion;
-        suggestionsList.appendChild(li);
+        const suggestions = getSuggestions(inputWord);
+
+        const suggestionsList = document.getElementById('suggestionsList');
+        suggestionsList.innerHTML = ''; // Clear previous suggestions
+
+        suggestions.forEach((suggestion) => {
+            const li = document.createElement('li');
+            li.textContent = suggestion;
+            suggestionsList.appendChild(li);
+        });
     });
 });
