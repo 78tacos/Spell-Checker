@@ -79,7 +79,7 @@ function loadDictionary(filePath) {
 
 // Initialize the spell checker
 document.addEventListener('DOMContentLoaded', () => {
-    loadDictionary('dictionary.txt'); // Load dictionary from same directory
+    loadDictionary('dictionary.txt'); //make sure dictionary is in same directory
 
     document.getElementById('checkButton').addEventListener('click', () => {
         const inputWord = document.getElementById('wordInput').value.toLowerCase();
