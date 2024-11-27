@@ -1,12 +1,10 @@
-// Utility functions for the spell checker
 const VOWELS = new Set(['a', 'e', 'i', 'o', 'u']);
 const CONSONANTS = new Set(
     'bcdfghjklmnpqrstvwxyz'.split('')
 );
 
-let dictionary = []; // Global dictionary array
+let dictionary = [];
 
-// Function to calculate penalty using sequence alignment
 function calculatePenalty(word1, word2) {
     const n = word1.length;
     const m = word2.length;
@@ -41,7 +39,6 @@ function calculatePenalty(word1, word2) {
     return dp[n][m];
 }
 
-// Get top 10 suggestions
 function getSuggestions(inputWord) {
     const scores = dictionary.map((word) => ({
         word,
@@ -52,24 +49,24 @@ function getSuggestions(inputWord) {
     return scores.slice(0, 10).map((entry) => entry.word);
 }
 
-// Load dictionary from file
+// load dictionary from same directory
 function loadDictionary(filePath) {
     fetch(filePath)
         .then((response) => {
             if (!response.ok) {
-                throw new Error(`Failed to load dictionary: ${response.statusText}`);
+                throw new Error(`Dictionary not loaded: ${response.statusText}`); 
             }
             return response.text();
         })
         .then((text) => {
-            // Process dictionary file line by line
+            // Process dictionary.txt file
             dictionary = text
                 .split('\n')
                 .map((line) => line.trim().toLowerCase())
-                .filter((word) => word); // Remove empty lines
+                .filter((word) => word); // in case there are empty lines
             
             console.log('Dictionary loaded successfully');
-            document.getElementById('checkButton').disabled = false; // Enable the button
+            document.getElementById('checkButton').disabled = false;
         })
         .catch((error) => {
             console.error(error);
@@ -77,23 +74,34 @@ function loadDictionary(filePath) {
         });
 }
 
+function handleSpellCheck() {
+    const inputWord = document.getElementById('wordInput').value.toLowerCase();
+    if (!inputWord) return;
+
+    const suggestions = getSuggestions(inputWord);
+
+    const suggestionsList = document.getElementById('suggestionsList');
+    suggestionsList.innerHTML = ''; // Clear previous suggestions
+
+    suggestions.forEach((suggestion) => {
+        const li = document.createElement('li');
+        li.textContent = suggestion;
+        suggestionsList.appendChild(li);
+    });
+}
+
 // Initialize the spell checker
 document.addEventListener('DOMContentLoaded', () => {
-    loadDictionary('dictionary.txt'); //make sure dictionary is in same directory
+    loadDictionary('dictionary.txt'); // Load dictionary from same directory
 
-    document.getElementById('checkButton').addEventListener('click', () => {
-        const inputWord = document.getElementById('wordInput').value.toLowerCase();
-        if (!inputWord) return;
+    // click
+    document.getElementById('checkButton').addEventListener('click', handleSpellCheck);
 
-        const suggestions = getSuggestions(inputWord);
-
-        const suggestionsList = document.getElementById('suggestionsList');
-        suggestionsList.innerHTML = ''; // Clear previous suggestions
-
-        suggestions.forEach((suggestion) => {
-            const li = document.createElement('li');
-            li.textContent = suggestion;
-            suggestionsList.appendChild(li);
-        });
+    // enter key
+    document.getElementById('wordInput').addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault(); 
+            handleSpellCheck();
+        }
     });
 });
