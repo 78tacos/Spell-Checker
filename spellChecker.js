@@ -100,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // enter key
     document.getElementById('wordInput').addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
-            event.preventDefault(); 
             handleSpellCheck();
         }
     });
