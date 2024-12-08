@@ -14,7 +14,7 @@ function calculatePenalty(word1, word2) {
         Array(m + 1).fill(0)
     );
 
-    // Gap penalties, O(nm)
+    // Gap penalties
     for (let i = 0; i <= n; i++) dp[i][0] = i * 2;
     for (let j = 0; j <= m; j++) dp[0][j] = j * 2;
 
@@ -33,6 +33,7 @@ function calculatePenalty(word1, word2) {
                 dp[i - 1][j - 1] + matchCost, // Match/mismatch
                 dp[i - 1][j] + 2, // Gap in word2
                 dp[i][j - 1] + 2 // Gap in word1
+                // O(nm)
             );
         }
     }
