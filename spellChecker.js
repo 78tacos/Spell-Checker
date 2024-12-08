@@ -50,7 +50,6 @@ function getSuggestions(inputWord) {
     return scores.slice(0, 10).map((entry) => entry.word);
 }
 
-// Load dictionary
 function loadDictionary(filePath) {
     fetch(filePath)
         .then((response) => {
@@ -89,7 +88,7 @@ function handleSpellCheck() {
 
 // The spell checker
 document.addEventListener('DOMContentLoaded', () => {
-    loadDictionary('dictionary.txt'); // Load dictionary
+    loadDictionary('dictionary.txt');
 
     // click
     document.getElementById('checkButton').addEventListener('click', handleSpellCheck);
